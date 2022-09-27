@@ -1,3 +1,21 @@
+# U-Boot 一些tips
+
+对于ARMv8架构配置的uboot环境配置如下：
+1. 请使用Linux kernel内部的dtb，不要使用uboot的dtb（否则你发现sd卡和mmc的配置是反过来的）
+2. 配置从SD卡的 bootargs ： `setenv bootargs "8250.nr_uarts=1 console=ttyS0,115200 root=/dev/mmcblk0p2 rw rootwait"`
+3. 配置bootcmd： `setenv bootcmd "fatload mmc 0:1 ${kernel_addr_r} Image;booti ${kernel_addr_r} - ${fdt_addr}"`
+4. 注意，不要像ARMv7一样把fdt_addr也load进来，在ARMv8中是内核通过参数传递的，直接引用地址就好了。（否则你的SD卡驱动可能在kernel阶段会失败）
+5. 如果fdt_addr已经被污染，可以删除掉内存卡boot分区中的`boot.env`
+6. 记得在config.txt中增加：
+
+```text
+enable_uart=1
+arm_64bit=1
+kernel=u-boot.bin
+```
+
+-----------------------
+
 # SPDX-License-Identifier: GPL-2.0+
 #
 # (C) Copyright 2000 - 2013
